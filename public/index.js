@@ -1,9 +1,5 @@
 $('document').ready(() => {
   const BASE_URL = 'http://localhost:3000/api';
-  /**
-   * File upload
-   * Listens to changes in file input
-   */
   $('#fileInput').on('change', ({ target: { files } }) => {
     if (files.length) {
       const file = files[0];
@@ -23,14 +19,25 @@ $('document').ready(() => {
     e.preventDefault();
     $.ajax({
       method: 'POST',
-      url: `${BASE_URL}/file/upload`,
+      url: `${BASE_URL}/file/`,
       processData: false,
       contentType: false,
       data: new FormData($('#file-upload')[0]),
       success: (data) => {
         prompt("Results:", JSON.stringify(data))
+      },
+      error: (response) => {
+        alert(response.responseJSON.message);
       }
     });
+  });
+
+  $('.file-download-input').on('change', (e) => {
+    if (e.target.value && e.target.value !== "") {
+      $('.file-download-button').removeClass('is-hidden');
+    } else {
+      $('.file-download-button').addClass('is-hidden');
+    }
   });
 
   $('.file-download-button').on('click', () => {
@@ -38,15 +45,40 @@ $('document').ready(() => {
     $.ajax({
       method: 'GET',
       url: `${BASE_URL}/file/${publicKey}/`,
-      success: (response, stats, request) => {
+      success: (response) => {
         // console.log(request.getResponseHeader('Content-Type'))
         // const blob = new Blob([response], { type: request.getResponseHeader('Content-Type') });
         // const downloadUrl = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = response.file.path;
-        a.download = "file.png";
+        const a = document.createElement('a');
+        a.href = response.path;
+        a.download = response.filename;
         document.body.appendChild(a);
         a.click();
+      },
+      error: (response) => {
+        alert(response.responseJSON.message);
+      }
+    })
+  });
+
+  $('.file-remove-input').on('change', (e) => {
+    if (e.target.value && e.target.value !== "") {
+      $('.file-remove-button').removeClass('is-hidden');
+    } else {
+      $('.file-remove-button').addClass('is-hidden');
+    }
+  });
+
+  $('.file-remove-button').on('click', () => {
+    const privateKey = $('.file-remove-input').val();
+    $.ajax({
+      method: 'DELETE',
+      url: `${BASE_URL}/file/${privateKey}/`,
+      success: (response) => {
+        alert(response.message);
+      },
+      error: (response) => {
+        alert(response.responseJSON.message);
       }
     })
   });
