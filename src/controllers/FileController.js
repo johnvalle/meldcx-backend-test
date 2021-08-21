@@ -89,8 +89,9 @@ async function upload(req, res, next) {
  *
  * @example Sample response:
  * {
- *    privateKey: string;
- *    publicKey: string;
+ *    path: string;
+ *    mimetype: string;
+ *    filename: string;
  * }
  */
 async function download(req, res, next) {
@@ -121,6 +122,19 @@ async function download(req, res, next) {
   }
 }
 
+/**
+ * Returns the file depending on the `privateKey`.
+ *
+ * Method: DELETE
+ * Content-Type: application/json
+ * Param: `:privateKey`
+ * Body: None
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ *
+ */
 async function remove(req, res, next) {
   try {
     const { privateKey } = req.params;
