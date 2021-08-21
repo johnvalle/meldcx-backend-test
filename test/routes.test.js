@@ -9,6 +9,9 @@ let testPrivateKey = null;
  * Test for uploading files
  */
 describe('POST /api/files/', () => {
+  /**
+   * Note: Test fails when MAX_DAILY_LIMIT is reached. When it happens, just adjust it in constants.
+   */
   it('should upload file', (done) => {
     request(app)
       .post('/api/file')
@@ -21,7 +24,8 @@ describe('POST /api/files/', () => {
         testPublicKey = res.body.publicKey;
         testPrivateKey = res.body.privateKey;
         done();
-      });
+      })
+      .catch((err) => done(err));
   });
 
   it('should return an error if file is not attached', (done) => {
@@ -30,7 +34,7 @@ describe('POST /api/files/', () => {
       .attach('file', null)
       .expect(400)
       .then((res) => {
-        expect(res.body).toHaveProperty('error', 'Not found');
+        expect(res.body).toHaveProperty('error');
         done();
       })
       .catch((err) => done(err));
@@ -53,7 +57,7 @@ describe('POST /api/files/', () => {
  * Test for download files
  */
 describe('GET /api/file/:publicKey', () => {
-  it('returns a file', (done) => {
+  it('should return a file', (done) => {
     const url = `/api/file/${testPublicKey}`;
     request(app)
       .get(url)
@@ -66,7 +70,7 @@ describe('GET /api/file/:publicKey', () => {
       });
   });
 
-  it('returns an error if publicKey is incorrect', (done) => {
+  it('should return an error if publicKey is incorrect', (done) => {
     const url = '/api/file/some-incorrect-id';
     request(app)
       .get(url)
@@ -83,7 +87,7 @@ describe('GET /api/file/:publicKey', () => {
  * Test for removing files
  */
 describe('DELETE /api/file/:publicKey', () => {
-  it('removes a file', (done) => {
+  it('should remove a file', (done) => {
     const url = `/api/file/${testPrivateKey}`;
     request(app)
       .delete(url)
@@ -94,7 +98,7 @@ describe('DELETE /api/file/:publicKey', () => {
       });
   });
 
-  it('returns an error if privateKey is incorrect', (done) => {
+  it('should return an error if privateKey is incorrect', (done) => {
     const url = '/api/file/some-incorrect-id';
     request(app)
       .delete(url)

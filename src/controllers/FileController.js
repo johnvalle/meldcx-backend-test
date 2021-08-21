@@ -127,22 +127,20 @@ async function remove(req, res, next) {
     const list = await db.where('privateKey', '==', privateKey).get();
 
     if (!list.empty) {
+      let file = null;
       list.forEach((doc) => {
-        const file = doc.data();
-        // delete actual file in cloud storage
-        if (process.env.PROVIDER === 'google') {
-          bucket.file(file.filename).delete();
-        }
-
-        // delete actual file in local directory
-        if (process.env.PROVIDER === 'local') {
-          fs.unlinkSync(`${process.env.FOLDER}/${file.filename}`);
-        }
-
+        file = doc.data();
         // delete database reference
         db.doc(doc.id).delete();
       });
-
+      // delete actual file in cloud storage
+      if (process.env.PROVIDER === 'google') {
+        await bucket.file(file.filename).delete();
+      }
+      // delete actual file in local directory
+      if (process.env.PROVIDER === 'local') {
+        fs.unlinkSync(`${process.env.FOLDER}/${file.filename}`);
+      }
       res.json({
         message: 'File has been removed sucessfully.'
       });
