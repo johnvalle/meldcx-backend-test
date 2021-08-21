@@ -155,12 +155,12 @@ async function remove(req, res, next) {
       if (process.env.PROVIDER === 'local') {
         fs.unlinkSync(`${process.env.FOLDER}/${file.filename}`);
       }
-      res.json({
+      return res.json({
         message: 'File has been removed sucessfully.'
       });
     }
 
-    res.status(400).json({
+    return res.status(400).json({
       error: 'Not found',
       message: 'File does not exist.'
     });
