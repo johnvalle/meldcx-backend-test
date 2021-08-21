@@ -72,4 +72,5 @@ typings/
 # Serverless directories
 .serverless
 
+# Service account
 meldcx-backend-test-323414-c960234cbcd0.json
