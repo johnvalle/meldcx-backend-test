@@ -28,7 +28,7 @@ npm install
 
 Sample .env
 
-```
+```bash
 NODE_ENV=development
 PORT=3000
 FOLDER=/absolute/path/to/public/uploads
