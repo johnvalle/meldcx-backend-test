@@ -1,6 +1,10 @@
 const { MAX_DAILY_SIZE } = require('../constants');
 const firebase = require('./firebase');
 
+/**
+ * Generates date for today
+ * @returns Date in yyyy-mm-dd format
+ */
 const getDateToday = () => {
   const today = new Date();
   let dd = today.getDate();
@@ -12,6 +16,13 @@ const getDateToday = () => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+/**
+ * Updates download or upload limit in database
+ * 
+ * @param {string} action Action can be `upload` or `download`
+ * @param {number} fileSize size of the file being uploaded or downloaded
+ * @param {string} ipAddress IP of the user
+ */
 async function updateDailyUsage({ action, fileSize, ipAddress }) {
   /** Init Firebase Firestore Database */
   const db = firebase.firestore().collection('daily_usage');

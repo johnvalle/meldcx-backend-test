@@ -89,8 +89,9 @@ async function upload(req, res, next) {
  *
  * @example Sample response:
  * {
- *    privateKey: string;
- *    publicKey: string;
+ *    path: string;
+ *    mimetype: string;
+ *    filename: string;
  * }
  */
 async function download(req, res, next) {
@@ -121,28 +122,39 @@ async function download(req, res, next) {
   }
 }
 
+/**
+ * Returns the file depending on the `privateKey`.
+ *
+ * Method: DELETE
+ * Content-Type: application/json
+ * Param: `:privateKey`
+ * Body: None
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ *
+ */
 async function remove(req, res, next) {
   try {
     const { privateKey } = req.params;
     const list = await db.where('privateKey', '==', privateKey).get();
 
     if (!list.empty) {
+      let file = null;
       list.forEach((doc) => {
-        const file = doc.data();
-        // delete actual file in cloud storage
-        if (process.env.PROVIDER === 'google') {
-          bucket.file(file.filename).delete();
-        }
-
-        // delete actual file in local directory
-        if (process.env.PROVIDER === 'local') {
-          fs.unlinkSync(`${process.env.FOLDER}/${file.filename}`);
-        }
-
+        file = doc.data();
         // delete database reference
         db.doc(doc.id).delete();
       });
-
+      // delete actual file in cloud storage
+      if (process.env.PROVIDER === 'google') {
+        await bucket.file(file.filename).delete();
+      }
+      // delete actual file in local directory
+      if (process.env.PROVIDER === 'local') {
+        fs.unlinkSync(`${process.env.FOLDER}/${file.filename}`);
+      }
       res.json({
         message: 'File has been removed sucessfully.'
       });
